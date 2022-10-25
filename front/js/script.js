@@ -5,13 +5,16 @@ fetch("http://localhost:3000/api/products")
     }
 })
 .then(function(allDataAPI) {
+    const startSection = document.getElementById('items');
     for (let sofa of allDataAPI) {
-        const sofaName = sofa.name;
-        const sofaDescription = sofa.description;
-        const sofaALT = sofa.altTxt;
-        const sofaImgUrl = sofa.imageUrl;
-
-        const startSection = document.getElementById('items');
-        startSection.innerHTML = "<a href="./product.html"><article><img src="`${sofaImgUrl}`" alt="`${sofaALT}`"><h3 class="productName">`${sofaName}`</h3><p class="productDescription">`${sofaDescription}`</p></article></a>";
+        startSection.innerHTML += `
+        <a href="./product.html">
+        <article>
+        <img src="${sofa.imageUrl}" alt="${sofa.altTxt}">
+        <h3 class="productName">"${sofa.name}"</h3>
+        <p class="productDescription">"${sofa.description}"</p>
+        </article>
+        </a>
+        `;
     }
 })
