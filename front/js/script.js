@@ -4,11 +4,11 @@ fetch("http://localhost:3000/api/products")
         return fetchAllData.json();
     }
 })
-.then(function(allDataAPI) {
+.then(function(applyHomeData) {
     const startSection = document.getElementById('items');
-    for (let sofa of allDataAPI) {
+    for (let sofa of applyHomeData) {
         startSection.innerHTML += `
-        <a href="./product.html">
+        <a href="./product.html?id=${sofa._id}">
         <article>
         <img src="${sofa.imageUrl}" alt="${sofa.altTxt}">
         <h3 class="productName">"${sofa.name}"</h3>
