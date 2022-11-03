@@ -3,16 +3,18 @@ let searchParams = new URLSearchParams(actualURL.search);
 
 if (searchParams.has("id")) {
     let productID = searchParams.get("id");
+    let adressToFetch = `http://localhost:3000/api/products/${productID}`;
 
-    `
-    fetch("http://localhost:3000/api/products/${productID}")
-    .then(function(fetchProductData) {
-        if (fetchProductData.ok) {
-            return fetchProductData.json();
-        }
-    })
-    .then(function(consoleLog) {
-        console.log(consoleLog);
-    })
-    `
+    fetch(adressToFetch)
+        .then(function(fetchProductData) {
+            if (fetchProductData.ok) {
+                return fetchProductData.json();
+            }
+        })
+        .then(function(consoleLog) {
+            console.log(consoleLog);
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
 }
