@@ -1,11 +1,11 @@
-fetch("http://localhost:3000/api/products")
+fetch("http://localhost:3000/api/products") //requête serveur des données de tous les produits
 .then(function(fetchAllData) {
     if (fetchAllData.ok) {
         return fetchAllData.json();
-    }
+    } //conversion des données en json
 })
 .then(function(applyHomeData) {
-    const startSection = document.getElementById('items');
+    const startSection = document.getElementById('items'); //recherche et acquisition de la section à complêter 
     for (let sofa of applyHomeData) {
         startSection.innerHTML += `
         <a href="./product.html?id=${sofa._id}">
@@ -17,4 +17,7 @@ fetch("http://localhost:3000/api/products")
         </a>
         `;
     }
-})
+}) /*
+mise en place d'une boucle créant dynamiquement les éléments pour chaque canapé présent sur le serveur
+utilisation de l'interpolation pour placer chaque donnée au bon endroit de façon dynamique également
+*/
