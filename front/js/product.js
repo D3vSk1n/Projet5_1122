@@ -11,10 +11,27 @@ if (searchParams.has("id")) {
                 return fetchProductData.json();
             }
         })
-        .then(function(consoleLog) {
-            console.log(consoleLog);
+        .then(function(applyData) {
+            const arrayData = [applyData];
+            const imgSection = document.getElementsByClassName('item__img')[0];
+            imgSection.innerHTML = `<img src="${arrayData[0].imageUrl}" alt="${arrayData[0].altTxt}"></img>`;
+            const titleSection = document.getElementById('title');
+            titleSection.textContent = `${arrayData[0].name}`;
+            const priceSection = document.getElementById('price');
+            priceSection.textContent = `${arrayData[0].price}`;
+            const descriptionSection = document.getElementById('description');
+            descriptionSection.textContent = `${arrayData[0].description}`;
+
+            for (let color of arrayData[0].colors) {
+                let colorSection = document.getElementById('colors');
+                let optionElement = document.createElement('option');
+
+                colorSection.appendChild(optionElement);
+                optionElement.setAttribute("value", `"${color}"`);
+                optionElement.textContent = `${color}`;
+            }
         })
         .catch(function(error) {
             console.log(error);
-        });
+        })
 }
