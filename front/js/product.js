@@ -33,8 +33,8 @@ if (searchParams.has("id")) {
                 let optionElement = document.createElement('option');
 
                 colorSection.appendChild(optionElement);
-                optionElement.setAttribute("value", `${color}`);
-                optionElement.textContent = `${color}`;
+                optionElement.setAttribute("value", color);
+                optionElement.textContent = color;
             }
                 /*mise en place d'une boucle créant des éléments option de façon dynamique et les remplissant 
                 avec les couleurs adéquates
@@ -47,31 +47,20 @@ if (searchParams.has("id")) {
 
 const buttonAddToCart = document.getElementById('addToCart');       //récupération de l'élément qu'on va écouter, ici le bouton "ajouter au panier"
 const sofaID = searchParams.get("id"); 
-const sofaColor = document.querySelector("#colors");
-const sofaQuantity = document.querySelector("#quantity");           //déclaration de variables en pointant les balises contenant les informations voulues
 
 function getColorChosen() {
-    sofaColor.addEventListener('change', function(event) {
-        localStorage.setItem("color", `${event.target.value}`)
-    });
+    return document.querySelector("#colors").value;
 }
 
 function getQuantityRequired() {
-    sofaQuantity.addEventListener('change', function(event) {
-        localStorage.setItem("quantity", `${event.target.value}`)
-    });
+   return document.querySelector("#quantity").value;
 }  
-/* déclaration de deux fonctions permettant l'écoute des champs couleurs 
-    et quantité et inscrivant la valeur choisie par l'utilisateur dans le LS */
-
-getColorChosen()
-getQuantityRequired()
 
 buttonAddToCart.addEventListener('click', function(eventInfo) {
     let actualBuy = {
-        id: `${sofaID}`,
-        color: localStorage.color,
-        quantity: localStorage.quantity,
+        id: sofaID,
+        color: getColorChosen(),
+        quantity: getQuantityRequired(),
     };
     
     let cart = [];
