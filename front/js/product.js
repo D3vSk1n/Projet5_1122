@@ -53,17 +53,32 @@ function getColorChosen() {
 }
 
 function getQuantityRequired() {
-   return document.querySelector("#quantity").value;
+   return parseInt(document.querySelector("#quantity").value, 10);
 }  
 
 buttonAddToCart.addEventListener('click', function(eventInfo) {
-    let actualBuy = {
-        id: sofaID,
-        color: getColorChosen(),
-        quantity: getQuantityRequired(),
-    };
-    
-    let cart = [];
-    console.log(actualBuy)
-    window.alert("Canapé dans le panier, bien joué les Bulls !")
+    let colorChosen = getColorChosen();
+    let quantityRequired = getQuantityRequired();
+    let actualBuy = { sofaID, colorChosen, quantityRequired };
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    console.log(cart);
+
+    if (cart == null) {
+        cart = [];
+    }
+    let productPresent = false;
+    for (let sofa of cart) {
+        if (actualBuy.sofaID == sofa.sofaID && actualBuy.colorChosen == sofa.colorChosen) {
+                sofa.quantityRequired += actualBuy.quantityRequired;
+                productPresent = true;
+        } 
+    }
+    if (productPresent == false) {
+        cart.push(actualBuy);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    console.log(actualBuy);
+    window.alert("Canapé dans le panier, bien joué les Bulls !");
 })
