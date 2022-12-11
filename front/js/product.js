@@ -56,7 +56,7 @@ function getQuantityRequired() {
    return parseInt(document.querySelector("#quantity").value, 10);
 }  
 
-buttonAddToCart.addEventListener('click', function(eventInfo) {
+buttonAddToCart.addEventListener('click', function() {
     let colorChosen = getColorChosen();
     let quantityRequired = getQuantityRequired();
     let actualBuy = { sofaID, colorChosen, quantityRequired };
