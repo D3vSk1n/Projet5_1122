@@ -1,5 +1,7 @@
 let cartProducts = JSON.parse(localStorage.getItem("cart"));
 const documentGeneralLocation = document.getElementById("cart__items");
+const totalQuantityLocation = document.getElementById("totalQuantity");
+const totalPriceLocation = document.getElementById("totalPrice");
 
 async function fetching(theUrl) {
     const fetchData = await fetch(theUrl).then((response) => response.json());
@@ -35,4 +37,54 @@ async function aNicePage() {
     }
 };
 
+async function calculateIndividualCost(product) {
+    const productsInfo = await fetching(`http://localhost:3000/api/products/${product.sofaID}`);
+    let finalIndividualCost = product.quantityRequired * productsInfo[0].price;
+    return finalIndividualCost;
+};
+
+async function calculateTotalPrice() {
+    let totalPrice = 0;
+    for (let sofa of cartProducts) {
+        let individualCost = await calculateIndividualCost(sofa);
+        totalPrice += individualCost;
+    }
+    totalPriceLocation.innerHTML = totalPrice;
+};
+
+function calculateTotalQuantity() {
+    let totalQuantity = 0;
+    for (let sofa of cartProducts) {
+        totalQuantity += sofa.quantityRequired;
+    }
+    totalQuantityLocation.innerHTML = totalQuantity;
+};
+
 aNicePage();
+calculateTotalPrice();
+calculateTotalQuantity();
+
+let deleteLocation = document.getElementsByClassName("deleteItem");
+console.log(deleteLocation);
+
+function creatingArray(collectionName) {
+    let newArray = [];
+    for (let i = 0; i < collectionName.length; i++) {
+        newArray.push(collectionName[i])
+    }
+    return newArray;
+};
+
+let deleteArray = Array.from(deleteLocation);
+console.log(deleteArray);
+
+const quantityLocation = document.getElementsByClassName("itemQuantity");
+
+for (let quantityModifier of quantityLocation) {
+    quantityModifier.addEventListener('change', function() {
+        console.log("yes");
+    })
+};
+
+deleteLocation = [...deleteLocation];
+deleteLocation = Array.prototype.slice.call(elements);
