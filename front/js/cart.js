@@ -1,18 +1,16 @@
 let cartProducts = JSON.parse(localStorage.getItem("cart"));
-const documentGeneralLocation = document.getElementById("cart__items");
-const totalQuantityLocation = document.getElementById("totalQuantity");
-const totalPriceLocation = document.getElementById("totalPrice");
+const domToModify = document.getElementById("cart__items");
 
 async function fetching(theUrl) {
     const fetchData = await fetch(theUrl).then((response) => response.json());
     const arrayData = [fetchData];
     return arrayData;
-};
+}
 
-async function aNicePage() {
+async function fillDOMWithCart() {
     for (let sofa of cartProducts) {
         const productsInfo = await fetching(`http://localhost:3000/api/products/${sofa.sofaID}`);
-        documentGeneralLocation.innerHTML += `
+        domToModify.innerHTML += `
             <article class="cart__item" data-id="${sofa.sofaID}" data-color="${sofa.colorChosen}">
                 <div class="cart__item__img">
                     <img src="${productsInfo[0].imageUrl}" alt="${productsInfo[0].altTxt}">
@@ -35,13 +33,13 @@ async function aNicePage() {
                 </div>
             </article>`
     }
-};
+}
 
 async function calculateIndividualCost(product) {
     const productsInfo = await fetching(`http://localhost:3000/api/products/${product.sofaID}`);
     let finalIndividualCost = product.quantityRequired * productsInfo[0].price;
     return finalIndividualCost;
-};
+}
 
 async function calculateTotalPrice() {
     let totalPrice = 0;
@@ -49,42 +47,53 @@ async function calculateTotalPrice() {
         let individualCost = await calculateIndividualCost(sofa);
         totalPrice += individualCost;
     }
+    const totalPriceLocation = document.getElementById("totalPrice");
     totalPriceLocation.innerHTML = totalPrice;
-};
+}
 
 function calculateTotalQuantity() {
     let totalQuantity = 0;
     for (let sofa of cartProducts) {
         totalQuantity += sofa.quantityRequired;
     }
+    const totalQuantityLocation = document.getElementById("totalQuantity");
     totalQuantityLocation.innerHTML = totalQuantity;
-};
+}
 
-aNicePage();
-calculateTotalPrice();
-calculateTotalQuantity();
+function getDeleteButtons() {
+    let deleteButtonsCollection = document.getElementsByClassName("deleteItem");
+    return(deleteButtonsCollection);
+}
 
-let deleteLocation = document.getElementsByClassName("deleteItem");
-console.log(deleteLocation);
+async function main() {
+    fillDOMWithCart();
+    calculateTotalQuantity();
+    calculateTotalPrice();
+    
+    await new Promise(resolve => setTimeout(resolve, 500))
 
-function creatingArray(collectionName) {
-    let newArray = [];
-    for (let i = 0; i < collectionName.length; i++) {
-        newArray.push(collectionName[i])
+    let deleteButtons = getDeleteButtons();
+
+    for (let deleteButton of deleteButtons) {
+        deleteButton.addEventListener('click', function() {
+            let productToDelete = deleteButton.closest('article');
+            let productDeletedID = productToDelete.dataset.id;
+            let productDeletedColor = productToDelete.dataset.color;
+            
+            domToModify.removeChild(productToDelete);
+
+            for (let sofa of cartProducts) {
+                if (sofa.sofaID == productDeletedID && sofa.colorChosen == productDeletedColor) {
+                    let deletedElement = cartProducts.splice(sofa, 1);
+                    console.log(deletedElement);
+                    console.log(cartProducts);
+                }
+            }
+            
+            calculateTotalQuantity();
+            calculateTotalPrice();
+        })    
     }
-    return newArray;
-};
+}
 
-let deleteArray = Array.from(deleteLocation);
-console.log(deleteArray);
-
-const quantityLocation = document.getElementsByClassName("itemQuantity");
-
-for (let quantityModifier of quantityLocation) {
-    quantityModifier.addEventListener('change', function() {
-        console.log("yes");
-    })
-};
-
-deleteLocation = [...deleteLocation];
-deleteLocation = Array.prototype.slice.call(elements);
+main();
