@@ -62,8 +62,43 @@ function calculateTotalQuantity() {
 
 function getDeleteButtons() {
     let deleteButtonsCollection = document.getElementsByClassName("deleteItem");
-    return(deleteButtonsCollection);
+    return deleteButtonsCollection;
 }
+
+function getQuantityFields() {
+    let quantityFieldsCollection = document.getElementsByClassName("itemQuantity");
+    return quantityFieldsCollection;
+}
+
+function quantityModification() {
+    let quantityFields = getQuantityFields();
+    
+        for (let quantity of quantityFields) {
+            quantity.addEventListener('change', function() {
+                let product = quantity.closest('article');
+                let productActualID = product.dataset.id;
+                let productActualColor = product.dataset.color;
+
+                for (let sofa of cartProducts) {
+                    if (sofa.sofaID == productActualID && sofa.colorChosen == productActualColor) {
+                        sofa.quantityRequired = parseInt(quantity.value, 10);
+                    }
+                }
+
+                calculateTotalQuantity();
+                calculateTotalPrice();
+
+                localStorage["cart"] = JSON.stringify(cartProducts);
+            })
+        }
+}
+
+/* function getQuantity() {
+    let quantityCollection = document.getElementsByClassName("itemQuantity");
+        for (let quantity of quantityCollection) {
+            let productActualQuantity = quantity.value;
+        }
+} */
 
 async function main() {
     fillDOMWithCart();
@@ -72,24 +107,26 @@ async function main() {
     
     await new Promise(resolve => setTimeout(resolve, 500))
 
+    quantityModification();
+
     let deleteButtons = getDeleteButtons();
 
     for (let deleteButton of deleteButtons) {
         deleteButton.addEventListener('click', function() {
             let productToDelete = deleteButton.closest('article');
-            let productDeletedID = productToDelete.dataset.id;
-            let productDeletedColor = productToDelete.dataset.color;
-            
             domToModify.removeChild(productToDelete);
 
-            for (let sofa of cartProducts) {
-                if (sofa.sofaID == productDeletedID && sofa.colorChosen == productDeletedColor) {
-                    let deletedElement = cartProducts.splice(sofa, 1);
-                    console.log(deletedElement);
-                    console.log(cartProducts);
-                }
+            /*let productsLocation = document.getElementsByClassName("cart__item");
+            
+            for (let product of productsLocation) {
+                let productActualID = product.dataset.id;
+                let productActualColor = product.dataset.color;
+                let productActualQuantity = getQuantity();
             }
             
+            cart = [];
+            let actualBuy = { productActualID, productActualColor, productActualQuantity }; */
+
             calculateTotalQuantity();
             calculateTotalPrice();
         })    
