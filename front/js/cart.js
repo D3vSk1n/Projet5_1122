@@ -85,20 +85,41 @@ function quantityModification() {
                     }
                 }
 
+                localStorage["cart"] = JSON.stringify(cartProducts);
+
                 calculateTotalQuantity();
                 calculateTotalPrice();
-
-                localStorage["cart"] = JSON.stringify(cartProducts);
             })
         }
 }
 
-/* function getQuantity() {
-    let quantityCollection = document.getElementsByClassName("itemQuantity");
-        for (let quantity of quantityCollection) {
-            let productActualQuantity = quantity.value;
+function deleteItem() {
+    let deleteButtons = getDeleteButtons();
+    
+        for (let deleteButton of deleteButtons) {
+            deleteButton.addEventListener('click', function() {
+                let productToDelete = deleteButton.closest('article');
+                domToModify.removeChild(productToDelete);
+                
+                let quantityFields = getQuantityFields();
+                let cartProducts = [];
+                for (let quantity of quantityFields) {
+                    let product = quantity.closest('article');
+                    let sofaID = product.dataset.id;
+                    let colorChosen = product.dataset.color;
+                    let quantityRequired = parseInt(quantity.value, 10);
+                    let craftingCart = { sofaID, colorChosen, quantityRequired};
+                    
+                    cartProducts.push(craftingCart);
+                }
+                
+                localStorage["cart"] = JSON.stringify(cartProducts);
+
+                calculateTotalQuantity();
+                calculateTotalPrice();
+            })
         }
-} */
+}
 
 async function main() {
     fillDOMWithCart();
@@ -108,29 +129,7 @@ async function main() {
     await new Promise(resolve => setTimeout(resolve, 500))
 
     quantityModification();
-
-    let deleteButtons = getDeleteButtons();
-
-    for (let deleteButton of deleteButtons) {
-        deleteButton.addEventListener('click', function() {
-            let productToDelete = deleteButton.closest('article');
-            domToModify.removeChild(productToDelete);
-
-            /*let productsLocation = document.getElementsByClassName("cart__item");
-            
-            for (let product of productsLocation) {
-                let productActualID = product.dataset.id;
-                let productActualColor = product.dataset.color;
-                let productActualQuantity = getQuantity();
-            }
-            
-            cart = [];
-            let actualBuy = { productActualID, productActualColor, productActualQuantity }; */
-
-            calculateTotalQuantity();
-            calculateTotalPrice();
-        })    
-    }
+    deleteItem();
 }
 
 main();
