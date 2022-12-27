@@ -1,16 +1,17 @@
-let cartProducts = JSON.parse(localStorage.getItem("cart"));
-const domToModify = document.getElementById("cart__items");
-
 async function fetching(theUrl) {
     const fetchData = await fetch(theUrl).then((response) => response.json());
     const arrayData = [fetchData];
     return arrayData;
-}
+};
 
-async function fillDOMWithCart() {
+async function addProductToCardDOM(cartProducts) {
+    const cartItemsContainer = document.getElementById("cart__items");
+
     for (let sofa of cartProducts) {
+
         const productsInfo = await fetching(`http://localhost:3000/api/products/${sofa.sofaID}`);
-        domToModify.innerHTML += `
+
+        cartItemsContainer.innerHTML += `
             <article class="cart__item" data-id="${sofa.sofaID}" data-color="${sofa.colorChosen}">
                 <div class="cart__item__img">
                     <img src="${productsInfo[0].imageUrl}" alt="${productsInfo[0].altTxt}">
@@ -31,34 +32,54 @@ async function fillDOMWithCart() {
                     </div>
                 </div>
                 </div>
-            </article>`
+            </article>`;
     }
-}
+};
 
 async function calculateIndividualCost(product) {
     const productsInfo = await fetching(`http://localhost:3000/api/products/${product.sofaID}`);
     let finalIndividualCost = product.quantityRequired * productsInfo[0].price;
     return finalIndividualCost;
-}
+};
 
-async function calculateTotalPrice() {
+async function calculateTotalPrice(cartProducts) {
+    const totalPriceLocation = document.getElementById("totalPrice");
     let totalPrice = 0;
     for (let sofa of cartProducts) {
         let individualCost = await calculateIndividualCost(sofa);
         totalPrice += individualCost;
     }
-    const totalPriceLocation = document.getElementById("totalPrice");
     totalPriceLocation.innerHTML = totalPrice;
-}
+};
 
-function calculateTotalQuantity() {
+function calculateTotalQuantity(cartProducts) {
+    const totalQuantityLocation = document.getElementById("totalQuantity");
     let totalQuantity = 0;
     for (let sofa of cartProducts) {
         totalQuantity += sofa.quantityRequired;
     }
-    const totalQuantityLocation = document.getElementById("totalQuantity");
     totalQuantityLocation.innerHTML = totalQuantity;
+};
+
+/* function creatingArray(collectionName) {
+    let newArray = [];
+    for (let i = 0; i < collectionName.length; i++) {
+        newArray.push(collectionName[i])
+    }
+    return newArray;
+};
+
+function setListenerToDeleteButons(){
+    let deleteLocationbuttons = document.getElementsByClassName("deleteItem");
+
+    for (deleteLocationbutton of deleteLocationbuttons) {
+        deleteLocationbutton.addEventListener("click", deleteItem);
+    }
 }
+
+function deleteItem(){
+    console.log("!!! FUNCTION deleteItem !!!")
+} */
 
 function getDeleteButtons() {
     let deleteButtonsCollection = document.getElementsByClassName("deleteItem");
@@ -75,6 +96,7 @@ function quantityModification() {
     
         for (let quantity of quantityFields) {
             quantity.addEventListener('change', function() {
+                let cartProducts = JSON.parse(localStorage.getItem("cart"));
                 let product = quantity.closest('article');
                 let productActualID = product.dataset.id;
                 let productActualColor = product.dataset.color;
@@ -87,19 +109,20 @@ function quantityModification() {
 
                 localStorage["cart"] = JSON.stringify(cartProducts);
 
-                calculateTotalQuantity();
-                calculateTotalPrice();
+                calculateTotalQuantity(cartProducts);
+                calculateTotalPrice(cartProducts);
             })
         }
 }
 
 function deleteItem() {
+    const cartItemsContainer = document.getElementById("cart__items");
     let deleteButtons = getDeleteButtons();
     
         for (let deleteButton of deleteButtons) {
             deleteButton.addEventListener('click', function() {
                 let productToDelete = deleteButton.closest('article');
-                domToModify.removeChild(productToDelete);
+                cartItemsContainer.removeChild(productToDelete);
                 
                 let quantityFields = getQuantityFields();
                 let cartProducts = [];
@@ -115,21 +138,23 @@ function deleteItem() {
                 
                 localStorage["cart"] = JSON.stringify(cartProducts);
 
-                calculateTotalQuantity();
-                calculateTotalPrice();
+                calculateTotalQuantity(cartProducts);
+                calculateTotalPrice(cartProducts);
             })
         }
 }
 
 async function main() {
-    fillDOMWithCart();
-    calculateTotalQuantity();
-    calculateTotalPrice();
-    
-    await new Promise(resolve => setTimeout(resolve, 500))
+    let cartProducts = JSON.parse(localStorage.getItem("cart"));
 
+    await addProductToCardDOM(cartProducts);
+    calculateTotalPrice(cartProducts);
+    calculateTotalQuantity(cartProducts);
     quantityModification();
     deleteItem();
 }
 
 main();
+
+let basicMask = /[A-Za-z-_]/g;
+let cityMask = /[\w -]/g;
