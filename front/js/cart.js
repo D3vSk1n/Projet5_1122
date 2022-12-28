@@ -61,26 +61,6 @@ function calculateTotalQuantity(cartProducts) {
     totalQuantityLocation.innerHTML = totalQuantity;
 };
 
-/* function creatingArray(collectionName) {
-    let newArray = [];
-    for (let i = 0; i < collectionName.length; i++) {
-        newArray.push(collectionName[i])
-    }
-    return newArray;
-};
-
-function setListenerToDeleteButons(){
-    let deleteLocationbuttons = document.getElementsByClassName("deleteItem");
-
-    for (deleteLocationbutton of deleteLocationbuttons) {
-        deleteLocationbutton.addEventListener("click", deleteItem);
-    }
-}
-
-function deleteItem(){
-    console.log("!!! FUNCTION deleteItem !!!")
-} */
-
 function getDeleteButtons() {
     let deleteButtonsCollection = document.getElementsByClassName("deleteItem");
     return deleteButtonsCollection;
@@ -156,5 +136,30 @@ async function main() {
 
 main();
 
-let basicMask = /[A-Za-z-_]/g;
-let cityMask = /[\w -]/g;
+function emailRegex(mail) {
+    let mailMask = /[\w.-]@[\w-].[A-Za-z]/g;
+    return mailMask.test(mail);
+}
+
+function basicFieldRegex(fieldValue) {
+    let basicMask = /[A-Za-z-_]/g;
+    return basicMask.test(fieldValue);
+}
+
+function craftContactObject() {
+    let contactObject = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        adress: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+    };
+    return contactObject;
+}
+
+let orderButton = document.getElementById("order");
+orderButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    craftContactObject();
+    console.log(craftContactObject());
+})
