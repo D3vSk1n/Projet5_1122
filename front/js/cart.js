@@ -136,30 +136,120 @@ async function main() {
 
 main();
 
-function emailRegex(mail) {
-    let mailMask = /[\w.-]@[\w-].[A-Za-z]/g;
-    return mailMask.test(mail);
-}
-
 function basicFieldRegex(fieldValue) {
-    let basicMask = /[A-Za-z-_]/g;
+    let basicMask = /^[a-z][a-z-_]*[a-z]$/i;
     return basicMask.test(fieldValue);
 }
 
-function craftContactObject() {
-    let contactObject = {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        adress: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        email: document.getElementById("email").value,
-    };
-    return contactObject;
+function lastNameRegex(nameValue) {
+    let lastNameMask = /^[a-z][a-z- _]*[a-z]$/i;
+    return lastNameMask.test(nameValue);
 }
 
-let orderButton = document.getElementById("order");
-orderButton.addEventListener('click', function(event) {
-    event.preventDefault();
-    craftContactObject();
-    console.log(craftContactObject());
-})
+function addressRegex(address) {
+    let addressMask = /^[\d]{1,4}\s[a-z]+\s[a-z _-]*[a-z]$/i;
+    return addressMask.test(address);
+}
+
+function emailRegex(email) {
+    let mailMask = /^[a-z\d]+[\w-]*\.?[\w-]*@[\w-]+\.[a-z]{2,}$/i;
+    return mailMask.test(email);
+}
+
+function noAccentInRegex(valueToSimplify) {
+    let noAccent = valueToSimplify.normalize('NFKD').replace(/[\u0300-\u036F\u1DC0-\u1DFF\u1AB0-\u1AFF]+/g, '');
+    return noAccent;
+}
+
+function verifyFields() {
+    let firstNameField = document.getElementById("firstName");
+    let lastNameField = document.getElementById("lastName");
+    let addressField = document.getElementById("address");
+    let cityField = document.getElementById("city");
+    let emailField = document.getElementById("email");
+
+    firstNameField.addEventListener('change', function(event) {
+        document.getElementById("firstNameErrorMsg").textContent = "";
+        firstName = noAccentInRegex(event.target.value);
+
+        if (basicFieldRegex(firstName) == false) {
+            document.getElementById("firstNameErrorMsg").textContent = "Nos gobelins ne trouvent pas votre prénom dans les registres; Seuls les lettres et tirets sont acceptés, deux lettres minimum";
+        }
+        if (event.target.value == "") {
+            document.getElementById("firstNameErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
+        }
+    });
+
+    lastNameField.addEventListener('change', function(event) {
+        document.getElementById("lastNameErrorMsg").textContent = "";
+        lastName = noAccentInRegex(event.target.value);
+
+        if (lastNameRegex(lastName) == false) {
+            document.getElementById("lastNameErrorMsg").textContent = "Quel est votre joli nom ? Seuls les lettres, espaces et tirets sont acceptés, deux lettres minimum";
+        }
+        if (event.target.value == "") {
+            document.getElementById("lastNameErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
+        }
+    });
+
+    addressField.addEventListener('change', function(event) {
+        document.getElementById("addressErrorMsg").textContent = "";
+        address = noAccentInRegex(event.target.value);
+
+        if (addressRegex(address) == false) {
+            document.getElementById("addressErrorMsg").textContent = "Où est ta tanière ? Un chiffre minimum séparé de lettres ou/et espaces et tirets";
+        }
+        if (event.target.value == "") {
+            document.getElementById("addressErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
+        }
+    });
+
+    cityField.addEventListener('change', function(event) {
+        document.getElementById("cityErrorMsg").textContent = "";
+        city = noAccentInRegex(event.target.value);
+
+        if (basicFieldRegex(city) == false) {
+            document.getElementById("cityErrorMsg").textContent = "Dans quelle contrée habitez-vous ? Seuls les lettres et tirets sont acceptés, deux lettres minimum";
+        }
+        if (event.target.value == "") {
+            document.getElementById("cityErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
+        }
+    });
+
+    emailField.addEventListener('change', function(event) {
+        document.getElementById("emailErrorMsg").textContent = "";
+        email = noAccentInRegex(event.target.value);
+
+        if (emailRegex(email) == false) {
+            document.getElementById("emailErrorMsg").textContent = "Miam c'est délicieux le mail mais le tien n'est pas valide; Format autorisé: X@X.X";
+        }
+        if (event.target.value == "") {
+            document.getElementById("emailErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
+        }
+    });
+}
+
+verifyFields();
+
+function orderProducts() {
+    let firstNameError = document.getElementById("firstNameErrorMsg");
+    let lastNameError = document.getElementById("lastNameErrorMsg");
+    let addressError = document.getElementById("addressErrorMsg");
+    let cityError = document.getElementById("cityErrorMsg");
+    let emailError = document.getElementById("emailErrorMsg");
+    let orderButton = document.getElementById("order");
+
+    orderButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        if ()
+        let contactObject = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            email: document.getElementById("email").value,
+        };
+    })
+}
+
+orderProducts();
