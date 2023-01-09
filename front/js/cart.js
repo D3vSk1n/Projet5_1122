@@ -82,7 +82,7 @@ function quantityModification() {
                 let productActualColor = product.dataset.color;
 
                 for (let sofa of cartProducts) {
-                    if (sofa.sofaID == productActualID && sofa.colorChosen == productActualColor) {
+                    if (sofa.sofaID === productActualID && sofa.colorChosen === productActualColor) {
                         sofa.quantityRequired = parseInt(quantity.value, 10);
                     }
                 }
@@ -124,18 +124,6 @@ function deleteItem() {
         }
 }
 
-async function main() {
-    let cartProducts = JSON.parse(localStorage.getItem("cart"));
-
-    await addProductToCardDOM(cartProducts);
-    calculateTotalPrice(cartProducts);
-    calculateTotalQuantity(cartProducts);
-    quantityModification();
-    deleteItem();
-}
-
-main();
-
 function basicFieldRegex(fieldValue) {
     let basicMask = /^[a-z][a-z-_]*[a-z]$/i;
     return basicMask.test(fieldValue);
@@ -172,10 +160,10 @@ function verifyFields() {
         document.getElementById("firstNameErrorMsg").textContent = "";
         firstName = noAccentInRegex(event.target.value);
 
-        if (basicFieldRegex(firstName) == false) {
+        if (basicFieldRegex(firstName) === false) {
             document.getElementById("firstNameErrorMsg").textContent = "Nos gobelins ne trouvent pas votre prénom dans les registres; Seuls les lettres et tirets sont acceptés, deux lettres minimum";
         }
-        if (event.target.value == "") {
+        if (event.target.value === "") {
             document.getElementById("firstNameErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
         }
     });
@@ -184,10 +172,10 @@ function verifyFields() {
         document.getElementById("lastNameErrorMsg").textContent = "";
         lastName = noAccentInRegex(event.target.value);
 
-        if (lastNameRegex(lastName) == false) {
+        if (lastNameRegex(lastName) === false) {
             document.getElementById("lastNameErrorMsg").textContent = "Quel est votre joli nom ? Seuls les lettres, espaces et tirets sont acceptés, deux lettres minimum";
         }
-        if (event.target.value == "") {
+        if (event.target.value === "") {
             document.getElementById("lastNameErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
         }
     });
@@ -196,10 +184,10 @@ function verifyFields() {
         document.getElementById("addressErrorMsg").textContent = "";
         address = noAccentInRegex(event.target.value);
 
-        if (addressRegex(address) == false) {
+        if (addressRegex(address) === false) {
             document.getElementById("addressErrorMsg").textContent = "Où est ta tanière ? Un chiffre minimum séparé de lettres ou/et espaces et tirets";
         }
-        if (event.target.value == "") {
+        if (event.target.value === "") {
             document.getElementById("addressErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
         }
     });
@@ -208,10 +196,10 @@ function verifyFields() {
         document.getElementById("cityErrorMsg").textContent = "";
         city = noAccentInRegex(event.target.value);
 
-        if (basicFieldRegex(city) == false) {
+        if (basicFieldRegex(city) === false) {
             document.getElementById("cityErrorMsg").textContent = "Dans quelle contrée habitez-vous ? Seuls les lettres et tirets sont acceptés, deux lettres minimum";
         }
-        if (event.target.value == "") {
+        if (event.target.value === "") {
             document.getElementById("cityErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
         }
     });
@@ -220,36 +208,103 @@ function verifyFields() {
         document.getElementById("emailErrorMsg").textContent = "";
         email = noAccentInRegex(event.target.value);
 
-        if (emailRegex(email) == false) {
+        if (emailRegex(email) === false) {
             document.getElementById("emailErrorMsg").textContent = "Miam c'est délicieux le mail mais le tien n'est pas valide; Format autorisé: X@X.X";
         }
-        if (event.target.value == "") {
+        if (event.target.value === "") {
             document.getElementById("emailErrorMsg").textContent = "N'oubliez-pas de remplir ce champ pour commander";
         }
     });
 }
 
-verifyFields();
+function craftProductsArray(cartProducts) {
+    let productsArray = [];
+    for (let sofa of cartProducts) {
+        productsArray.push(sofa.sofaID);
+    }
 
-function orderProducts() {
+    return productsArray;
+}
+
+function craftContactObject() {
+    let contactObject = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        email: document.getElementById("email").value,
+    }
+
+    return contactObject;
+}
+
+async function postDataToApi(dataToSend) {
+    const postAndGetResult = await fetch("http://localhost:3000/api/products/order", {
+	    method: "POST",
+	    headers: { 
+            'Accept': 'application/json', 
+            'Content-Type': 'application/json' 
+        },
+	    body: JSON.stringify(dataToSend)
+    })
+    .then((response) => response.json());
+
+    let postResponse = [postAndGetResult];
+    return postResponse;
+}
+
+async function redirecting(response) {
+    let orderId = response[0].orderId;
+
+    window.location.href=`./confirmation.html?orderId=${orderId}`;
+}
+
+function orderProducts(cartProducts) {
+    let firstNameField = document.getElementById("firstName");
+    let lastNameField = document.getElementById("lastName");
+    let addressField = document.getElementById("address");
+    let cityField = document.getElementById("city");
+    let emailField = document.getElementById("email");
     let firstNameError = document.getElementById("firstNameErrorMsg");
     let lastNameError = document.getElementById("lastNameErrorMsg");
     let addressError = document.getElementById("addressErrorMsg");
     let cityError = document.getElementById("cityErrorMsg");
     let emailError = document.getElementById("emailErrorMsg");
     let orderButton = document.getElementById("order");
+    
 
-    orderButton.addEventListener('click', function(event) {
+    orderButton.addEventListener('click', async function(event) {
         event.preventDefault();
-        if ()
-        let contactObject = {
-            firstName: document.getElementById("firstName").value,
-            lastName: document.getElementById("lastName").value,
-            address: document.getElementById("address").value,
-            city: document.getElementById("city").value,
-            email: document.getElementById("email").value,
-        };
+
+        if (firstNameField.value === "" || lastNameField.value === "" || addressField.value === "" || cityField.value === "" || emailField.value === "") {
+            window.alert('Veuillez remplir tous les champs pour commander');
+        } else if (firstNameError.textContent != "" || lastNameError.textContent != "" || addressError.textContent != "" || cityError.textContent != "" || emailError.textContent != "") {
+            window.alert('Veuillez remplir les champs du formulaire de façon adéquat pour valider votre commande');
+        } else {
+            let contactToSend = craftContactObject();
+            let arrayProductsToSend = craftProductsArray(cartProducts);
+            let dataToSend = {
+              contact: contactToSend,
+              products: arrayProductsToSend
+            }
+
+            let apiResponse = await postDataToApi(dataToSend);
+            
+            redirecting(apiResponse); 
+        }
     })
 }
 
-orderProducts();
+async function main() {
+    let cartProducts = JSON.parse(localStorage.getItem("cart"));
+
+    await addProductToCardDOM(cartProducts);
+    calculateTotalPrice(cartProducts);
+    calculateTotalQuantity(cartProducts);
+    quantityModification();
+    deleteItem();
+    verifyFields();
+    orderProducts(cartProducts);
+}
+
+main();
